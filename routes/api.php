@@ -13,6 +13,8 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
+Route::middleware('auth:api, permissions')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+Route::get('/users', "API\UserController@index")->middleware('auth:api','permissions');
