@@ -17,4 +17,4 @@ Route::middleware('auth:api, permissions')->get('/user', function (Request $requ
     return $request->user();
 });
 
-Route::get('/users', "API\UserController@index")->middleware('auth:api','permissions');
+Route::resource('users', 'API\UserController')->middleware('auth:api, permissions');

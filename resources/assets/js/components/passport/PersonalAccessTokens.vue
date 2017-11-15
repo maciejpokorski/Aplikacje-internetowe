@@ -172,7 +172,6 @@
 
                 form: {
                     name: '',
-                    scopes: [],
                     errors: []
                 }
             };

@@ -3,6 +3,7 @@
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Exceptions;
 
 class RolesPermissionsSeeder extends Seeder
 {
@@ -33,7 +34,7 @@ class RolesPermissionsSeeder extends Seeder
     public static function getPermissiondAndCreateNewOneIfDoesNotExist($name){
          try {
             $permission = Permission::findByName($name);
-        } catch (PermissionDoesNotExist $e) {
+        } catch (Spatie\Permission\Exceptions\PermissionDoesNotExist $e) {
             echo("Permission ".$name." has been created ");
             $permission = Permission::create(['name' => $name]);
         }
@@ -43,7 +44,7 @@ class RolesPermissionsSeeder extends Seeder
      public static function getRoleAndCreateNewOneIfDoesNotExist($name){
         try {
             $role = Role::findByName($name);
-        } catch (RoleDoesNotExist $e) {
+        } catch (Spatie\Permission\Exceptions\RoleDoesNotExist $e) {
              echo("Role ".$name." has been created ");
             $role = Role::create(['name' => $name]);
         }
