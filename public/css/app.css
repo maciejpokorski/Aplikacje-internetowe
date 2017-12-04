@@ -8354,6 +8354,10 @@ button.close {
   position: relative;
 }
 
+.completed {
+  background-color: #3c763d;
+}
+
 [v-cloak]::before {
   position: absolute;
   top: 0;

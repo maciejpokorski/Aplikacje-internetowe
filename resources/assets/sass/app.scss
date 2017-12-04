@@ -12,6 +12,10 @@
   position: relative;
 }
 
+.completed{
+  background-color: #3c763d;
+}
+
 [v-cloak] > * {}
 [v-cloak]::before { 
   position: absolute;

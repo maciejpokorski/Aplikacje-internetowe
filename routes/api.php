@@ -17,4 +17,8 @@ Route::middleware('auth:api, permissions')->get('/user', function (Request $requ
     return $request->user();
 });
 
+Route::post('/users/{id}/sync/roles', 'API\UserController@syncRoles')->middleware('auth:api, permissions');
+Route::post('/users/{id}/sync/permissions', 'API\UserController@syncPermissions')->middleware('auth:api, permissions');
 Route::resource('users', 'API\UserController')->middleware('auth:api, permissions');
+Route::resource('permissions', 'API\PermissionController')->middleware('auth:api, permissions');
+Route::resource('roles', 'API\RoleController')->middleware('auth:api, permissions');

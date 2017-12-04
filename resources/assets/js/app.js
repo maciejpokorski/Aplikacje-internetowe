@@ -35,27 +35,41 @@ Vue.component(
     require('./components/superAdminControl/userManager.vue')
 );
 
+Vue.component(
+    'role-manager',
+    require('./components/superAdminControl/roleManager.vue')
+);
+
+Vue.component(
+    'permission-manager',
+    require('./components/superAdminControl/permissionManager.vue')
+);
+
+Vue.component(
+    'dash-board',
+    require('./components/superAdminControl/dashBoard.vue')
+);
+
 Vue.component('simple-panel-wrapper', {
-    props: ['size', 'offset'],
+    props: ['size', 'offset', 'title'],
     template:
     `
-            <div class="container">
-                <div class="row">
-                    <div :class="[size, offset]">
-                        <div class="panel panel-default">
-                            <div class="panel-heading">Manage Users</div>
-                            <div class="panel-body">
-                                <slot></slot>
-                            </div>
-                        </div>
-                    </div>
+        <div :class="[size, offset]">
+            <div class="panel panel-default">
+                <div class="panel-heading">{{title}}</div>
+                <div class="panel-body">
+                    <slot></slot>
                 </div>
             </div>
-        `
+        </div>
+     `
 })
 
 
 Vue.component('example-component', require('./components/ExampleComponent.vue'));
+
+//new Vue instance, use as Event Dispatcher (global communication BUS)
+window.Event = new Vue();
 
 const app = new Vue({
     el: '#app'

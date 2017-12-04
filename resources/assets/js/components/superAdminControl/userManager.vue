@@ -1,9 +1,48 @@
+<style scoped>
+    .User-list{
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+    .User-list--element, .User-list--sync-btn-wrappper {
+        display: flex;
+        flex-wrap: no-wrap;
+        flex-direction: row;
+        justify-content: space-between;
+        padding: 5px 10px;
+    }
+    .User-list--element-btn{
+        background-color: #E75151;
+        color: #fff;
+    }
+    .User-list--editable{
+        padding-right: 5px;
+    }
+    .User-list--v-select{
+        margin: 3px 7px;
+        width: 100%;
+    }
+</style>
+
 <template>
     <div>
-        <ul id="example-1">
+        <ul id="User-list" class="User-list">
             <li v-for="(user, index) in users">
-                {{ user.email }}
-                <span @click="remove(user, index)">delete</span>
+                <span class="User-list--element">
+                    <editable class="User-list--editable" :value.sync='user.email' attr="email" @change='update(user, $event)'></editable>
+                    <button @click="remove(user, index)" type="button" class="btn btn-default User-list--element-btn">
+                        <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                    </button>
+                </span>
+                <span class="User-list--sync-btn-wrappper">                
+                 <v-select class="User-list--v-select" multiple label="name" :options.sync="roles" :value.sync="user.roles"></v-select>
+                 <button class="btn btn-default" @click="sync(user, 'roles', $event)"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span></button>
+                </span>
+                <span class="User-list--sync-btn-wrappper">                
+                 <v-select class="User-list--v-select" multiple label="name" :options.sync="permissions" :value.sync="user.permissions"></v-select>
+                 <button class="btn btn-default" @click="sync(user, 'permissions', $event)"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span></button>
+                </span> 
+                  <hr>
             </li>
         </ul>
         <div>
@@ -90,66 +129,126 @@
 </template>
 
 <script>
+import Editable from 'vue-xeditable/src/Editable.vue'
+import vSelect from "vue-select"
 export default {
-    props: ['size', "offset"],
 
-    data() {
-        return {
-            users: [],
-            form: {
-                name: '',
-                email: '',
-                password: '',
-                errors: [],
-                success: []
-                }
-        };
+  data() {
+    return {
+      users: [],
+      form: {
+        name: "",
+        email: "",
+        password: "",
+        errors: [],
+        success: []
+      }
+    };
+  },
+
+  props: ['roles', 'permissions'],
+
+  mounted() {
+    this.getUsers();
+    Event.$on('deleteRole', this.getUsers);
+    Event.$on('deletePermission', this.getUsers);
+    
+  },
+
+    components: {
+    'editable': Editable,
+    'v-select': vSelect
+  },
+
+  methods: {
+    getUsers() {
+      axios.get("/api/users").then(response => {
+        this.users = response.data
+      });
     },
 
-    mounted() {
-        this.getUsers();
+    sync(user, type, event){
+        var clickedButton = event.target;
+        var roles, permissions = null;
+        if(type =='roles')
+            //change object to array        
+            roles = Object.keys(user.roles).map(key => user.roles[key].name)
+        else
+            permissions = Object.keys(user.permissions).map(key => user.permissions[key].name)
+         axios
+        .post("/api/users/"+user.id+"/sync/"+type, roles?roles:permissions)
+            .then(response => {
+                Event.$emit('markSuccess', clickedButton);
+        })
+        .catch(error => {
+          if (typeof error.response.data === "object") {
+            this.form.errors = _.flatten(_.toArray(error.response.data));
+          } else {
+            this.form.errors = ["Something went wrong. Please try again."];
+          }
+        });
     },
 
-    methods: {
-        getUsers() {
-            axios.get('/api/users')
-                .then(response => {
-                    this.users = response.data;
-                });
-        },
+    clearFormInputs() {
+      this.form.name = "";
+      this.form.email = "";
+      this.form.password = "";
+    },
 
-        clearFormInputs(){
-            this.form.name = '';
-            this.form.email = '';
-            this.form.password = '';
-        },
+    showCreateUserForm() {
+      this.clearFormInputs();
+      $("#modal-create-user").modal("show");
+    },
 
-        showCreateUserForm(){
-            this.clearFormInputs();
-            $('#modal-create-user').modal('show');
-        },
+    remove(user, index) {
+      axios
+        .delete("/api/users/" + user.id)
+        .then(response => {
+            if(response.data == user.id)
+                 Vue.delete(this.users, index);
+        })
+        .catch(error => {
+          if (typeof error.response.data === "object") {
+            this.form.errors = _.flatten(_.toArray(error.response.data));
+          } else {
+            this.form.errors = ["Something went wrong. Please try again."];
+          }
+        });
+    },
 
-        remove(user, index){
-            Vue.delete(this.users, index);
-            console.log(user);
-        },
+    store() {
+      axios
+        .post("/api/users/", this.form)
+        .then(response => {
+          this.form.errors = [];
+          this.form.success.push(
+            "User " + response.data.name + " has been created."
+          );
+          this.users.push(response.data);
+          this.clearFormInputs();
+        })
+        .catch(error => {
+          if (typeof error.response.data === "object") {
+            this.form.errors = _.flatten(_.toArray(error.response.data));
+          } else {
+            this.form.errors = ["Something went wrong. Please try again."];
+          }
+        });
+    },
 
-        store(){
-             axios.post('/api/users/', this.form).then(response => {
-                            this.form.errors = [];
-                            this.form.success.push('User '+response.data.name + ' has been created.')
-                            this.users.push(response.data);
-                            this.clearFormInputs();
-                        })
-                        .catch(error => {
-                            if (typeof error.response.data === 'object') {
-                                this.form.errors = _.flatten(_.toArray(error.response.data));
-                            } else {
-                                this.form.errors = ['Something went wrong. Please try again.'];
-                            }
-                        });
-        }
-
+    update(user, event){
+        var clickedElement = event.target;
+        axios({
+            method:'put',
+            url:'/api/users/'+user.id,
+            data: {
+                email: user.email
+            }
+        })
+        .then(function(response) {
+             Event.$emit('markSucces', clickedElement);
+        });
     }
-}
+  }
+};
 </script>
