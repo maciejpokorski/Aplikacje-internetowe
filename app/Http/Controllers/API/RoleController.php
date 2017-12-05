@@ -18,6 +18,7 @@ class RoleController extends Controller
             'name'=>'required|max:120|unique:roles',
         ]);
         $request->guard_name = "web";
+        return "ok";
         return Role::create(["guard_name" => 'web', 'name' => $request->name]);
     }
 
