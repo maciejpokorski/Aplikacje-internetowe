@@ -22,3 +22,4 @@ Route::post('/users/{id}/sync/permissions', 'API\UserController@syncPermissions'
 Route::resource('users', 'API\UserController')->middleware('auth:api, permissions');
 Route::resource('permissions', 'API\PermissionController')->middleware('auth:api, permissions');
 Route::resource('roles', 'API\RoleController')->middleware('auth:api, permissions');
+Route::resource('tests', 'API\TestController')->middleware('auth:api, permissions');

@@ -20,3 +20,11 @@ Auth::routes();
 Route::get('/dashboard', 'UserController@index');
 
 Route::get('/home', 'HomeController@index')->name('home');
+
+Route::get('/tests', function(){
+    return view('tests');
+});
+
+Route::get('/tests/{id}', function($test){
+    return view('single-test')->with('test', $test);
+});

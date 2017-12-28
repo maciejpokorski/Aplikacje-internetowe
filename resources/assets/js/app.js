@@ -50,6 +50,17 @@ Vue.component(
     require('./components/superAdminControl/dashBoard.vue')
 );
 
+Vue.component(
+    'test-manager',
+    require('./components/testsComponents/testManager.vue')
+);
+
+Vue.component(
+    'single-test-manager',
+    require('./components/testsComponents/singleTestManager.vue')
+);
+
+
 Vue.component('simple-panel-wrapper', {
     props: ['size', 'offset', 'title'],
     template:
