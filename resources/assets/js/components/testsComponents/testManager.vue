@@ -78,7 +78,25 @@
                                     <input id="name" type="text" class="form-control" name="name" v-model="form.name">
                                 </div>
                             </div>
-                          
+                            <div class="form-group">
+                                <label class="col-md-4 control-label">Description</label>
+
+                                <div class="col-md-6">
+                                   <textarea name="description" class="form-control" rows="5" id="comment"></textarea>
+                                </div>
+                            </div>
+                          <div class="form-group">
+                              <label for="" class="col-md-4 control-label">Start date</label>
+                              <div class="col-md-6">
+                                  <datepicker v-model="form.start_date"></datepicker>
+                              </div>
+                          </div>
+                          <div class="form-group">
+                              <label for="" class="col-md-4 control-label">Finish date</label>
+                              <div class="col-md-6">
+                                  <datepicker v-model="form.finish_date"></datepicker>
+                              </div>
+                          </div>
                         </form>
                     </div>
 
@@ -102,6 +120,7 @@
 <script>
 import Editable from 'vue-xeditable/src/Editable.vue'
 import vSelect from "vue-select"
+import Datepicker from 'vuejs-datepicker';
 export default {
 
   data() {
@@ -109,6 +128,9 @@ export default {
       tests: [],
       form: {
         name: "",
+        description: "",
+        start_date: new Date(),
+        finish_date: new Date(new Date().getTime() + 24 * 60 * 60 * 1000),
         errors: [],
         success: []
       }
@@ -121,7 +143,8 @@ export default {
   },
 
  components: {
-    'editable': Editable
+    'editable': Editable,
+    'datepicker': Datepicker
   },
 
 
@@ -129,7 +152,6 @@ export default {
     getTests() {
       axios.get("/api/tests").then(response => {
         this.tests = response.data
-        console.log(this.tests)
       });
     },
 
@@ -144,7 +166,7 @@ export default {
 
     remove(test, index) {
       axios
-        .delete("/api/test/" + test.id)
+        .delete("/api/tests/" + test.id)
         .then(response => {
             if(response.data == test.id){
                 Vue.delete(this.tests, index);                
@@ -161,14 +183,16 @@ export default {
     },
 
     store() {
+        this.form.start_date = this.form.start_date.toISOString().slice(0, 19).replace('T', ' ');
+        this.form.finish_date = this.form.finish_date.toISOString().slice(0, 19).replace('T', ' '); 
       axios
         .post("/api/tests/", this.form)
         .then(response => {
           this.form.errors = [];
           this.form.success.push(
-            "Role " + response.data.name + " has been created."
+            "Test " + response.data.name + " has been created."
           );
-          this.roles.push(response.data);
+          this.tests.push(response.data);
           this.clearFormInputs();
         })
         .catch(error => {

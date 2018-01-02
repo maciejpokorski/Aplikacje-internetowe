@@ -62,12 +62,17 @@ Vue.component(
 
 
 Vue.component('simple-panel-wrapper', {
-    props: ['size', 'offset', 'title'],
+    props: ['size', 'offset', 'title', "href"],
     template:
     `
         <div :class="[size, offset]">
             <div class="panel panel-default">
-                <div class="panel-heading">{{title}}</div>
+                <div class="panel-heading" v-if="href">
+                  <a :href='href'>{{title}}</a>
+                </div>
+                <div class="panel-heading" v-else>
+                    {{title}}
+                </div>
                 <div class="panel-body">
                     <slot></slot>
                 </div>
