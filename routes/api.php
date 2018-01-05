@@ -23,3 +23,8 @@ Route::resource('users', 'API\UserController')->middleware('auth:api, permission
 Route::resource('permissions', 'API\PermissionController')->middleware('auth:api, permissions');
 Route::resource('roles', 'API\RoleController')->middleware('auth:api, permissions');
 Route::resource('tests', 'API\TestController')->middleware('auth:api, permissions');
+Route::resource('questions', 'API\QuestionController')->middleware('auth:api, permissions');
+Route::resource('answers', 'API\AnswerController')->middleware('auth:api, permissions');
+Route::post('/questions/toggle-question-test', 'API\QuestionController@toggleQuestionTest')->middleware('auth:api, permissions');
+Route::get('/answers/question/{id}', 'API\AnswerController@getAnswersForQuestion')->middleware('auth:api, permissions');
+

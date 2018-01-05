@@ -25,6 +25,14 @@ Route::get('/tests', function(){
     return view('tests');
 });
 
+Route::get('/questions', function(){
+    return view('questions');
+});
+
+Route::get('/questions/{id}', function($question){
+    return view('single-question')->with('question', $question);
+});
+
 Route::get('/tests/{id}', function($test){
     return view('single-test')->with('test', $test);
 });
