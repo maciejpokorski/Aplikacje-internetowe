@@ -19,8 +19,8 @@
     }
 </style>
 
-<template>
-    <simple-panel-wrapper title="Go back to tests list"  :href="back_to_tests_href" size="col-md-12" offset="col-md-offset-0">
+<template><div>
+    <simple-panel-wrapper title="Go back to tests list"  :href="back_to_tests_href" size="col-md-6" offset="col-md-offset-0">
       <div>
        Name: <editable class="Test" :value.sync='test.name' @change='update(test)'></editable>
       </div>
@@ -35,19 +35,21 @@
         Finish date:
         <datepicker class="Test" :format="date_format"  v-model="test.finish_date" v-on:input='update(test, 1)'></datepicker>
       </div>
-        
+      
     </simple-panel-wrapper>
-  
+  </div>
+
 </template>
 
 <script>
-import Editable from 'vue-xeditable/src/Editable.vue'
+import Editable from 'vue-xeditable/src/Editable.vue';
 import Datepicker from 'vuejs-datepicker';
+import QuestionManager from './questionManager';
 export default {
 
   data() {
     return {
-      back_to_tests_href: "",
+      back_to_tests_href: "/tests",
       date_format: 'yyyy-MM-dd',
       test: {
       }
@@ -62,21 +64,20 @@ props: [ 'test_id' ],
 
  components: {
     'editable': Editable,
-    'datepicker': Datepicker
+    'datepicker': Datepicker,
+    'question-manager' : QuestionManager
   },
 
 
   methods: {
     getTest() {
      axios.get("/api/tests/"+this.test_id).then(response => {
-         this.test = response.data
-         this.back_to_tests_href = "/tests"
+         this.test = response.data[0];
       });
     },
     update(test, format_date){
       if(format_date)
         this.prepareDateFormat(test);
-      console.log(test);
       return;
       axios({
             method:'put',

@@ -19,8 +19,8 @@ class CreateTestTable extends Migration
             $table->string('description')->nullable($value = true);
             $table->date('start_date')->nullable($value = true);
             $table->date('finish_date')->nullable($value = true); 
-            $table->integer('user_id')->unsigned()->comment("who create");  
-            $table->integer('time_limit')->unsigned()->comment("in seconds");      
+            $table->integer('user_id')->unsigned()->comment("who create");
+            $table->integer('time_limit')->unsigned()->nullable($value = true)->comment("in seconds");      
             $table->timestamps();
 
             $table->foreign('user_id')

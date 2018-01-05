@@ -14,7 +14,7 @@ class TestController extends Controller
     }
 
     public function show($id){
-        return \App\Test::find($id);
+        return \App\Test::find($id)->with('questions')->get();
     }
 
     public function store(Request $request){

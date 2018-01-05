@@ -60,6 +60,20 @@ Vue.component(
     require('./components/testsComponents/singleTestManager.vue')
 );
 
+Vue.component(
+    'question-manager',
+    require('./components/testsComponents/questionManager.vue')
+);
+
+Vue.component(
+    'single-question-manager',
+    require('./components/testsComponents/singleQuestionManager.vue')
+);
+
+Vue.component(
+    'answer-manager',
+    require('./components/testsComponents/answerManager.vue')
+);
 
 Vue.component('simple-panel-wrapper', {
     props: ['size', 'offset', 'title', "href"],

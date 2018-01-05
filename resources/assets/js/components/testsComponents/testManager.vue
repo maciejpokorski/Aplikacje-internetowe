@@ -82,7 +82,7 @@
                                 <label class="col-md-4 control-label">Description</label>
 
                                 <div class="col-md-6">
-                                   <textarea name="description" class="form-control" rows="5" id="comment"></textarea>
+                                   <textarea name="description" class="form-control" rows="5" id="description" v-model="form.description"></textarea>
                                 </div>
                             </div>
                           <div class="form-group">
@@ -207,7 +207,7 @@ export default {
     update(test){
         axios({
             method:'put',
-            url:'/api/test/'+role.id,
+            url:'/api/test/'+test.id,
             data: {
                 name: test.name
             }
