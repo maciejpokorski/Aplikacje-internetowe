@@ -10,6 +10,7 @@ class Answer extends Model
         'name', 'is_correct'
     ];
 
+
     public function question(){
         return $this->belongsTo('App\Question');
     }

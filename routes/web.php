@@ -36,3 +36,7 @@ Route::get('/questions/{id}', function($question){
 Route::get('/tests/{id}', function($test){
     return view('single-test')->with('test', $test);
 });
+
+Route::get('/tests/{id}/attempt', function($test){
+    return view('test-attempt')->with('test', $test);
+});

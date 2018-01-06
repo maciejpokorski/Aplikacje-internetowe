@@ -30,7 +30,9 @@ class QuestionController extends Controller
     }
 
     public function show($id){
-        return \App\Question::find($id);
+        $question = \App\Question::find($id);
+        $question->answers = $question->answers()->get();
+        return $question;
     }
 
     public function store(Request $request){

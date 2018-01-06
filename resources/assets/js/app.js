@@ -75,6 +75,11 @@ Vue.component(
     require('./components/testsComponents/answerManager.vue')
 );
 
+Vue.component(
+    'test-attempt-manager',
+    require('./components/testsComponents/testAttemptManager.vue')
+);
+
 Vue.component('simple-panel-wrapper', {
     props: ['size', 'offset', 'title', "href"],
     template:

@@ -14,7 +14,7 @@ class TestController extends Controller
     }
 
     public function show($id){
-        return \App\Test::find($id)->with('questions')->get();
+        return \App\Test::find($id)->with('questions.answers')->get();
     }
 
     public function store(Request $request){
@@ -56,5 +56,17 @@ class TestController extends Controller
         $test = \App\Test::findOrFail($id); 
 
         return $test->delete()?$id:-1;
+    }
+
+    public function testAttempt(Request $request, $id){
+       $attempt = \App\TestAttempt::firstOrNew(['test_id' => $id, 'user_id' => $request->user()->id] , ['test_id' => $id]);
+       if(empty($attempt->test_id)){
+           $attempt->test_id = $id;
+           $attempt->user_id = $request->user()->id;
+           return $attempt->save();
+       }
+       else {
+           return $attempt;
+       }
     }
 }

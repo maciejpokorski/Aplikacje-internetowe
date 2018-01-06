@@ -18,7 +18,7 @@ class AnswerController extends Controller
     }
 
     public function getAnswersForQuestion($id){
-        return \App\Answer::all()->where('question_id', $id);
+        return \App\Answer::where('question_id', $id)->get();
     }
 
     public function store(Request $request){

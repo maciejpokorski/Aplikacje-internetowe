@@ -3,8 +3,24 @@
   position: relative;
 }
 
+.txt-center{
+  text-align: center;
+}
+
 .Answer-btn {
   background-color: #e75151;
+  color: #fff;
+  position: absolute;
+  top: 5px;
+  right: 25px;
+}
+
+.Answer-btn-check.active{
+  background-color:  #00dd81;
+}
+
+.Answer-btn-check {
+  background-color: #e4e4e4;
   color: #fff;
   position: absolute;
   top: 5px;
@@ -17,14 +33,22 @@
     <simple-panel-wrapper title="Answers" size="col-md-12" offset="col-md-offset-0">
       <div v-for="(answer, index) in answers" class="relative" >
          <simple-panel-wrapper :title="index+1" size="col-md-6 col-xs-12" offset="col-md-offset-0">
-          <h2><editable :value.sync='answer.name' @change='update(answer)'></editable></h2>
-          <label class="checkbox-inline"><input type="checkbox" v-model='answer.is_correct' @click="update(answer)" :checked="answer.is_correct">Is correct</label>
-           <button @click="remove(answer, index)" type="button" class="btn btn-default Answer-btn">
+          <h2 v-if="enableUpdates">
+            <editable  :value.sync='answer.name' @change='update(answer)'></editable>
+          </h2>
+          <h2 v-else class="txt-center">
+            {{answer.name}}
+          </h2>
+          <label v-if="enableUpdates" class="checkbox-inline"><input type="checkbox" v-model='answer.is_correct' @click="update(answer)" :checked="answer.is_correct">Is correct</label>
+           <button v-if="enableUpdates" @click="remove(answer, index)" type="button" class="btn btn-default Answer-btn">
                   <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
             </button>
+             <button v-else @click="checkAnswer(answer, index)" type="button" :class="{'btn btn-default Answer-btn-check' : 1, 'active' : answer.is_picked}">
+                  <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+            </button>
           </simple-panel-wrapper>
-      </div>
-       <div class=col-md-12>
+        </div>
+       <div class=col-md-12 v-if="enableUpdates">
             <a class="action-link" @click="showCreateAnswerForm">
                 Create New Answer
             </a>
@@ -114,7 +138,14 @@ export default {
     };
   },
 
-  props: ["question_id"],
+ props: {
+   question_id: '',
+   enableUpdates: {
+     default: true
+   },
+   test_answers: {}
+},
+
 
   mounted() {
     this.getAnswers();
@@ -180,6 +211,22 @@ export default {
             this.form.errors = ["Something went wrong. Please try again."];
           }
         });
+    },
+
+    checkAnswer(answer, event) {
+      if(!this.enableUpdates){
+        answer.is_picked = !answer.is_picked;
+        this.checkAnswerInTestAttempt(answer, answer.is_picked);
+      }
+    },
+
+    checkAnswerInTestAttempt(given_answer, given_answer_is_picked){
+      this.test_attempt[this.question_id].forEach(function(ans ,key){
+        if(ans.id == given_answer.id){
+          ans.is_picked = given_answer_is_picked;
+        }
+      })
+      console.log(JSON.stringify(this.test_attempt[this.question_id]));
     },
 
     showCreateAnswerForm() {

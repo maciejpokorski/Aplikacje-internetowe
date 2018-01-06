@@ -35,7 +35,6 @@
         Finish date:
         <datepicker class="Test" :format="date_format"  v-model="test.finish_date" v-on:input='update(test, 1)'></datepicker>
       </div>
-      
     </simple-panel-wrapper>
   </div>
 

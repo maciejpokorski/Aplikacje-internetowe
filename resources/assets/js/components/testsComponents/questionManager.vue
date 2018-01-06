@@ -208,7 +208,7 @@ props: {
         axios
         .post("/api/questions/toggle-question-test", { test_id: this.test_id, question_id:question_id})
         .then(response => {
-            console.log(response);
+            
         });
     },
 

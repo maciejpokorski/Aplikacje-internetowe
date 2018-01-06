@@ -20,23 +20,28 @@
 </style>
 
 <template>
-    <simple-panel-wrapper title="Go back to questions list"  href="/questions" size="col-md-12" offset="col-md-offset-0">
-      <div>
+    <simple-panel-wrapper :title="title"  :href="href" size="col-md-12" offset="col-md-offset-0">
+      <div v-if="enableUpdates">
         <div>
         Name: <editable class="Test" :value.sync='question.name' @change='update(question)'></editable>
         </div>
         <div>
-        Description: <editable class="Test" :value.sync='question.description' @change='update(question)'></editable>
+        Description: <editable class="Test" :disabled="true" :options="[{disabled: true}]" :value.sync='question.description' @change='update(question)'></editable>
         </div>
         <br>
       </div>
-      <slot name="question-answers"></slot>
+      <div v-else>
+        <p>{{question.description}}</p>
+        <hr>
+      </div>
+      <slot name="answers"></slot>
     </simple-panel-wrapper>
   
 </template>
 
 <script>
 import Editable from "vue-xeditable/src/Editable.vue";
+import AnswerManager from "./answerManager";
 export default {
   data() {
     return {
@@ -44,14 +49,27 @@ export default {
     };
   },
 
-  props: ["question_id"],
+
+  props: {
+   question_id: '',
+   title: {
+     default: 'Go back to questions list'
+   },
+   href: {
+     default: '/questions'
+   },
+   enableUpdates: {
+     default: true
+   }
+},
 
   mounted() {
     this.getQuestion();
   },
 
   components: {
-    editable: Editable
+    editable: Editable,
+    AnswerManager
   },
 
   methods: {

@@ -25,9 +25,14 @@
         <ul id="Test-list" class="Test-list">
             <li v-for="(test, index) in tests" class="Test-list--element">
                 <a :href="'/tests/' + test.id">{{test.name}}</a>
-                <button @click="remove(test, index)" type="button" class="btn btn-default Test-list--element-btn">
-                    <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
-                </button>
+                <div>
+                    <a :href='"/tests/" + test.id + "/attempt"' class="btn btn-success" role="button">
+                        <span class="glyphicon glyphicon-play" aria-hidden="true"></span>
+                    </a>                    
+                    <button @click="remove(test, index)" type="button" class="btn btn-default Test-list--element-btn">
+                        <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                    </button>
+                </div>
             </li>
         </ul>
         <div>
