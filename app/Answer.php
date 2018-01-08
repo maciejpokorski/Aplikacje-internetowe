@@ -11,6 +11,10 @@ class Answer extends Model
     ];
 
 
+    public function user_answer(){
+        return $this->hasOne('App\UserAnswer');
+    }
+
     public function question(){
         return $this->belongsTo('App\Question');
     }

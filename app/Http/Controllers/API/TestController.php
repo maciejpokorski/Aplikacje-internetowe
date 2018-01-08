@@ -10,7 +10,7 @@ use Auth;
 class TestController extends Controller
 {
     public function index(Request $request) {
-       return \App\Test::all();
+       return \App\Test::with('testAttempts.user')->get();
     }
 
     public function show($id){
@@ -36,6 +36,34 @@ class TestController extends Controller
 
     }
 
+    public function saveAttempt(Request $request, $id){
+        $attempt = \App\TestAttempt::firstOrNew(
+            ['test_id' => $id, 'user_id' => $request->user()->id], ['test_id' => $id, 'user_id' => $request->user()->id, 'score' => 0, 'is_finished' => 0]
+        );
+        if(empty($attempt->id)){
+            $attempt->save();
+            return $attempt;
+        }else{
+            if($request->save){
+                $attempt->is_finished = 1;
+                $attempt->score = $this->countScore($attempt);
+                $attempt->save();
+            }
+            return $attempt;
+        }
+    }
+
+    private function countScore($attempt){
+        $score = 0;
+        $user_answers = \App\UserAnswer::where(['user_id' => $attempt->user_id, 'test_id' => $attempt->test_id])->with('answer')->get();
+        $collection = $user_answers->each(function ($item, $key) use(&$score) {
+            if($item->answer->is_correct){
+                $score = $score + 1;
+            }
+        });
+        return $score;
+    }
+
     public function update(Request $request, $id){
         $test = \App\Test::findOrFail($id); 
         $this->validate($request, [
@@ -56,17 +84,5 @@ class TestController extends Controller
         $test = \App\Test::findOrFail($id); 
 
         return $test->delete()?$id:-1;
-    }
-
-    public function testAttempt(Request $request, $id){
-       $attempt = \App\TestAttempt::firstOrNew(['test_id' => $id, 'user_id' => $request->user()->id] , ['test_id' => $id]);
-       if(empty($attempt->test_id)){
-           $attempt->test_id = $id;
-           $attempt->user_id = $request->user()->id;
-           return $attempt->save();
-       }
-       else {
-           return $attempt;
-       }
     }
 }

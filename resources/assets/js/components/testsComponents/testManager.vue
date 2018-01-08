@@ -1,22 +1,23 @@
 <style scoped>
-    .Test-list{
-        margin: 0;
-        padding: 0;
-    }
-    .Test-list--element {
-        display: flex;
-        flex-wrap: no-wrap;
-        flex-direction: row;
-        justify-content: space-between;
-        padding: 5px 10px;
-    }
-    .Test-list--element-btn{
-        background-color: #E75151;
-        color: #fff;
-    }
-    .Test-list--editable{
-        padding-right: 5px;
-    }
+.Test-list {
+  margin: 0;
+  padding: 0;
+}
+.Test-list--element {
+  display: flex;
+  flex-wrap: no-wrap;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 5px 10px;
+}
+.Test-list--element-btn {
+  background-color: #e75151;
+  color: #fff;
+}
+.Test-list--editable {
+  padding-right: 5px;
+}
+
 </style>
 
 <template>
@@ -24,7 +25,22 @@
         <div>
         <ul id="Test-list" class="Test-list">
             <li v-for="(test, index) in tests" class="Test-list--element">
-                <a :href="'/tests/' + test.id">{{test.name}}</a>
+                <div>
+                    <a :href="'/tests/' + test.id">{{test.name}}</a>
+                    <div>
+                     <ul>
+                        <h3>Attempts</h3>
+                        <li class="Attempt-list-el" v-for="testAttempt in test.test_attempts">
+                            <span>Date: {{testAttempt.updated_at}}, </span>
+                            <span>score: {{testAttempt.score}}, </span>
+                            <span>by: {{testAttempt.user.email}}</span>
+                             <a :href='"/tests/" + test.id + "/results/"+testAttempt.user.id' class="btn btn-default" role="button">
+                                 <span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span>
+                            </a>  
+                        </li> 
+                    </ul>
+                    </div>
+                </div>
                 <div>
                     <a :href='"/tests/" + test.id + "/attempt"' class="btn btn-success" role="button">
                         <span class="glyphicon glyphicon-play" aria-hidden="true"></span>
@@ -33,6 +49,8 @@
                         <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
                     </button>
                 </div>
+
+               
             </li>
         </ul>
         <div>
@@ -123,11 +141,10 @@
 </template>
 
 <script>
-import Editable from 'vue-xeditable/src/Editable.vue'
-import vSelect from "vue-select"
-import Datepicker from 'vuejs-datepicker';
+import Editable from "vue-xeditable/src/Editable.vue";
+import vSelect from "vue-select";
+import Datepicker from "vuejs-datepicker";
 export default {
-
   data() {
     return {
       tests: [],
@@ -142,21 +159,19 @@ export default {
     };
   },
 
-
   mounted() {
     this.getTests();
   },
 
- components: {
-    'editable': Editable,
-    'datepicker': Datepicker
+  components: {
+    editable: Editable,
+    datepicker: Datepicker
   },
-
 
   methods: {
     getTests() {
       axios.get("/api/tests").then(response => {
-        this.tests = response.data
+        this.tests = response.data;
       });
     },
 
@@ -173,10 +188,9 @@ export default {
       axios
         .delete("/api/tests/" + test.id)
         .then(response => {
-            if(response.data == test.id){
-                Vue.delete(this.tests, index);                
-            }
-
+          if (response.data == test.id) {
+            Vue.delete(this.tests, index);
+          }
         })
         .catch(error => {
           if (typeof error.response.data === "object") {
@@ -188,8 +202,14 @@ export default {
     },
 
     store() {
-        this.form.start_date = this.form.start_date.toISOString().slice(0, 19).replace('T', ' ');
-        this.form.finish_date = this.form.finish_date.toISOString().slice(0, 19).replace('T', ' '); 
+      this.form.start_date = this.form.start_date
+        .toISOString()
+        .slice(0, 19)
+        .replace("T", " ");
+      this.form.finish_date = this.form.finish_date
+        .toISOString()
+        .slice(0, 19)
+        .replace("T", " ");
       axios
         .post("/api/tests/", this.form)
         .then(response => {
@@ -209,17 +229,14 @@ export default {
         });
     },
 
-    update(test){
-        axios({
-            method:'put',
-            url:'/api/test/'+test.id,
-            data: {
-                name: test.name
-            }
-        })
-        .then(function(response) {
-           
-        });
+    update(test) {
+      axios({
+        method: "put",
+        url: "/api/test/" + test.id,
+        data: {
+          name: test.name
+        }
+      }).then(function(response) {});
     }
   }
 };

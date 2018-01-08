@@ -7,11 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 class TestAttempt extends Model
 {
     protected $fillable = [
-        'name', 'description', 'start_date', 'finish_date'
+        'user_id', 'test_id', 'score', 'is_finished'
     ];
-
+    
     public function test(){
-        return $this->belongsTo('App\Test');
+        return \App\Test::where('id', $this->test_id)->get();
     }
 
     public function user(){

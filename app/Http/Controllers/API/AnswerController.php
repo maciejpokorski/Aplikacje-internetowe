@@ -59,4 +59,26 @@ class AnswerController extends Controller
 
         return $answer->delete()?$id:-1;
     }
+
+    public function testAnswers(Request $request){
+        if(empty($request->user_attempt_id))
+            return $user_answers = \App\UserAnswer::where('test_id', $request->test_id)->where('user_id', $request->user()->id)->where('question_id', $request->question_id)->get();
+         else 
+            return $user_answers = \App\UserAnswer::where('test_id', $request->test_id)->where('user_id', $request->user_attempt_id)->where('question_id', $request->question_id)->get();
+    }
+
+    public function saveResult(Request $request){
+        if(empty(  $user_answers = \App\UserAnswer::where('user_id', $request->user()->id)->where('test_id', $request->test_id)->where('question_id', $request->question_id)->where('answer_id', $request->answer_id)->first()))
+        {
+            $user_answers = new \App\UserAnswer;
+            $user_answers->user_id = $request->user()->id;
+            $user_answers->test_id = $request->test_id;
+            $user_answers->question_id = $request->question_id;
+            $user_answers->answer_id = $request->answer_id;
+            $user_answers->save();
+        }
+        else {
+            $user_answers->delete();
+        }
+    }
 }

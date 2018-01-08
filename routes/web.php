@@ -40,3 +40,7 @@ Route::get('/tests/{id}', function($test){
 Route::get('/tests/{id}/attempt', function($test){
     return view('test-attempt')->with('test', $test);
 });
+
+Route::get('/tests/{id}/results/{user_attempt_id?}', function($test, $user_attempt_id){
+    return view('test-results')->with('test', $test)->with('user_attempt_id', $user_attempt_id);
+});

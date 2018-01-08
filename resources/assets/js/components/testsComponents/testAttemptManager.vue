@@ -26,14 +26,18 @@
 </style>
 <template>
     <simple-panel-wrapper :title="test.name" size="col-md-12" offset="col-md-offset-0">
+    <h1 v-if="show_r">
+      Result: <strong>{{score}}</strong>
+    </h1>
     <slick v-if="Object.keys(test).length > 0" ref="slick" :options="slickOptions">
       <div v-for="question in test.questions">
         <single-question-manager :enableUpdates="false" :title="question.name" :href="null" :question_id='question.id'>
-         <answer-manager slot="answers" :enableUpdates="false" :question_id="question.id"></answer-manager>
+        
+         <answer-manager slot="answers" :user_attempt_id='user_attempt_id' :show_results="show_r" :test_id="test.id" :enableUpdates="false" :question_id="question.id"></answer-manager>
         </single-question-manager>
     </div>
     </slick>
-     <button  @click="finish()" type="button" class="btn right btn-success">
+     <button v-if="!show_r && !user_attempt_id" @click="finish(1)" type="button" class="btn right btn-success">
           <span class="glyphicon glyphicon-send" aria-hidden="true">
           </span>
           Finish and see results
@@ -50,8 +54,9 @@ export default {
   data() {
     return {
       test: {},
-      test_attempt: {},
+      show_r: false,
       test_answers: [],
+      score: 0,
       slickOptions: {
         slidesToShow: 1,
         dots: true,
@@ -61,7 +66,8 @@ export default {
   },
 
   mounted() {
-    this.getTest();
+    this.checkIfAlreadyFilled();
+    this.show_r = this.show_results;
   },
 
   components: {
@@ -70,34 +76,28 @@ export default {
     AnswerManager
   },
 
-  props: ["test_id"],
+  props: ["test_id","show_results",'user_attempt_id'],
 
   methods: {
     getTest() {
       axios.get("/api/tests/" + this.test_id).then(response => {
         this.test = response.data[0];
-        this.startAttempt();
       });
     },
 
-    startAttempt(){
-       axios.get("/api/tests/" + this.test_id + "/attempt").then(response => {
-        this.test_attempt = this.test
-        var savedQuestions = JSON.parse(response.data.question_and_answers);
-        if(Object.keys(savedQuestions).length)
-         this.test_attempt.questions = savedQuestions;
-
-        var obj = {};
-        this.test_attempt.questions.forEach(function(question){
-          question.answers.forEach(function(answer){
-            answer.is_picked = false;
-          })
-          obj[question.id] = question.answers;
-        });
-        this.test_answers = obj;
-        this.test_attempt.attempt_id = response.data.id;
-      });
+    finish(){
+      this.checkIfAlreadyFilled(1);
     },
+
+   checkIfAlreadyFilled(save = 0){
+    axios.post("/api/tests/save-attempt/" + this.test_id, {save: save}).then(response => {
+       if(response.data.is_finished && !this.show_r){
+         this.show_r = true;
+         this.score = response.data.score;
+       }
+    });
+    this.getTest();
+   },
 
     next() {
       this.$refs.slick.next();

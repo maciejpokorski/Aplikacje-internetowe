@@ -26,5 +26,7 @@ Route::resource('tests', 'API\TestController')->middleware('auth:api, permission
 Route::resource('questions', 'API\QuestionController')->middleware('auth:api, permissions');
 Route::resource('answers', 'API\AnswerController')->middleware('auth:api, permissions');
 Route::post('/questions/toggle-question-test', 'API\QuestionController@toggleQuestionTest')->middleware('auth:api, permissions');
+Route::post('/answers/save-result', 'API\AnswerController@saveResult')->middleware('auth:api');
+Route::post('/tests/save-attempt/{id}', 'API\TestController@saveAttempt')->middleware('auth:api, permissions');
 Route::get('/answers/question/{id}', 'API\AnswerController@getAnswersForQuestion')->middleware('auth:api, permissions');
-Route::get('/tests/{id}/attempt', 'API\TestController@testAttempt')->middleware('auth:api');
+Route::get('/test-answers', 'API\AnswerController@testAnswers')->middleware('auth:api');

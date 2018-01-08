@@ -30,4 +30,8 @@ class User extends Authenticatable
     protected $hidden = [
         'password', 'remember_token',
     ];
+
+    public function testAttempts(){
+        return $this->hasMany('App\TestAttempt');
+    }
 }

@@ -26,6 +26,10 @@
   top: 5px;
   right: 25px;
 }
+.Answer-btn-check.picked_answer.push_left{
+  right: 125px;
+}
+
 </style>
 
 <template>
@@ -43,8 +47,19 @@
            <button v-if="enableUpdates" @click="remove(answer, index)" type="button" class="btn btn-default Answer-btn">
                   <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
             </button>
-             <button v-else @click="checkAnswer(answer, index)" type="button" :class="{'btn btn-default Answer-btn-check' : 1, 'active' : answer.is_picked}">
-                  <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+             <button v-if='!show_results' @click="checkAnswer(answer, index)" type="button" :class="{'btn btn-default Answer-btn-check' : 1, 'active' : answer.is_picked}">
+                  <span class="glyphicon glyphicon-ok" aria-hidden="true">
+                  </span>
+            </button>
+            <button v-if='answer.is_picked && show_results' type="button" :class="{'btn btn-default Answer-btn-check picked_answer' : 1, 'push_left' : answer.is_correct}">
+                 Given
+                  <span class="glyphicon glyphicon-ok" aria-hidden="true">
+                  </span>
+            </button>
+            <button v-if='show_results && answer.is_correct' type="button" :class="{'btn btn-default Answer-btn-check' : 1, 'active' : 1}">
+                 Correct
+                  <span class="glyphicon glyphicon-ok" aria-hidden="true">
+                  </span>
             </button>
           </simple-panel-wrapper>
         </div>
@@ -128,6 +143,7 @@ export default {
   data() {
     return {
       answers: [],
+      test_answers: [],
       form:{
         name: '',
         question_id: '',
@@ -140,14 +156,23 @@ export default {
 
  props: {
    question_id: '',
+   show_results: {
+     default: false
+   },
    enableUpdates: {
      default: true
    },
-   test_answers: {}
+   user_attempt_id: {
+     default: ""
+   },
+   test_id: {
+
+   }
 },
 
 
   mounted() {
+    this.getTestAnswers();
     this.getAnswers();
     this.form.question_id = this.question_id;
   },
@@ -159,7 +184,21 @@ export default {
   methods: {
     getAnswers() {
       axios.get("/api/answers/question/" + this.question_id).then(response => {
+        var ta = this.test_answers
+        response.data.forEach(function(answer){
+          answer.is_picked = false;
+          ta.forEach(function(test_answer){
+            if(test_answer.answer_id == answer.id)
+              answer.is_picked = true;
+          })
+        })
         this.answers = response.data;
+      });
+    },
+
+    getTestAnswers(){
+     axios.get("/api/test-answers/", {params: {test_id: this.test_id, question_id: this.question_id, user_attempt_id:this.user_attempt_id}}).then(response => {
+       this.test_answers = response.data;
       });
     },
 
@@ -214,19 +253,30 @@ export default {
     },
 
     checkAnswer(answer, event) {
+      if(this.show_results)
+        return;
+
       if(!this.enableUpdates){
         answer.is_picked = !answer.is_picked;
-        this.checkAnswerInTestAttempt(answer, answer.is_picked);
+        this.saveAnswerToResults(answer);
       }
     },
 
-    checkAnswerInTestAttempt(given_answer, given_answer_is_picked){
-      this.test_attempt[this.question_id].forEach(function(ans ,key){
-        if(ans.id == given_answer.id){
-          ans.is_picked = given_answer_is_picked;
-        }
-      })
-      console.log(JSON.stringify(this.test_attempt[this.question_id]));
+    saveAnswerToResults(answer){
+      var data = {
+        answer_id: answer.id,
+        answer_is_picked: answer.is_picked,
+        question_id: this.question_id,
+        test_id: this.test_id
+      }
+       axios
+        .post("/api/answers/save-result", data)
+        .then(response => {
+          
+        })
+        .catch(error => {
+        
+        });
     },
 
     showCreateAnswerForm() {
